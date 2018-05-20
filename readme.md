@@ -21,6 +21,7 @@ The external UART can be connected to FTDI cable through an isolator board, so t
 **QEI from amplifier**
 PA0 - TIM2_CH1
 PA1 - TIM2_CH2
+(PA3 - TIM2_CH3)
 
 **QEI / step-dir from cnc**
 PA8 - TIM1_CH1
@@ -28,8 +29,6 @@ PA9 - TIM1_CH2
 PA12 - TIM1_ETR
 
 **Analog output**
-//PA6 - TIM16_CH1
-//PA3 - TIM15_CH2
 PA4 - DAC1_OUT1
 PA5 - DAC1_OUT2
 

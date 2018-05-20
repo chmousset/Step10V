@@ -1,3 +1,6 @@
 [submodule "ChibiOS"]
 	path = ChibiOS
 	url = ssh://git@github.com/ChibiOS/ChibiOS.git
+[submodule "siglib"]
+	path = siglib
+	url = https://github.com/chmousset/siglib.git
