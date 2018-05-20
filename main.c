@@ -23,7 +23,7 @@
 static const DACConfig daccfg = {
   .init         = 0U,
   .datamode     = DAC_DHRM_12BIT_RIGHT_DUAL,
-  .cr           = (uint32_t)DAC_CR_EN2
+  .cr           = 0
 };
 
 static const I2CConfig i2c_cfg = {
