@@ -130,6 +130,8 @@ CSRC = $(ALLCSRC) \
        siglib/sigf.c \
        siglib/sig.c \
        $(CHIBIOS)/os/various/syscalls.c \
+       ssd1306.c \
+       Font16px.c \
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.

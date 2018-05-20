@@ -23,7 +23,15 @@
 static const DACConfig daccfg = {
   .init         = 0U,
   .datamode     = DAC_DHRM_12BIT_RIGHT_DUAL,
-  .cr           = DAC_CR_EN2
+  .cr           = (uint32_t)DAC_CR_EN2
+};
+
+static const I2CConfig i2c_cfg = {
+	STM32_TIMINGR_PRESC(0U) |
+	STM32_TIMINGR_SCLDEL(4U) | STM32_TIMINGR_SDADEL(2U) |
+	STM32_TIMINGR_SCLH(15U)  | STM32_TIMINGR_SCLL(21U),
+	0,
+	0
 };
 
 bool loop_enable = 1;
@@ -36,16 +44,10 @@ void dac_out(int32_t dac)
 		dac += 10;
 	if(dac < 0)
 		dac -= 10;
-	// if(dac > 0)
-	// {
-		dac1 = (uint16_t)(2048 + dac/2);
-		dac2 = (uint16_t)(2048 - dac/2);
-	// }
-	// else
-	// {
-	// 	dac1 = 2048 + (uint16_t)dac/2;
-	// 	dac2 = (uint16_t)(-1 * dac)/2 + 2048;
-	// }
+
+	dac1 = (uint16_t)(2048 + dac/2);
+	dac2 = (uint16_t)(2048 - dac/2);
+
 	dac_lld_put_channel(&DACD1, 0, dac1);
 	dac_lld_put_channel(&DACD1, 1, dac2);
 }
@@ -166,6 +168,13 @@ int main(void) {
 	sdStart(&SD2, NULL);
 	start_shell();
 
+	// i2cStart(&I2CD1, &i2c_cfg);
+	i2cStart(&I2CD3, &i2c_cfg);
+	palSetPadMode(GPIOB, 4, PAL_MODE_ALTERNATE(4));
+	palSetPadMode(GPIOA, 7, PAL_MODE_ALTERNATE(4));
+	// palSetPadMode(GPIOB, 6, PAL_MODE_ALTERNATE(4));
+	// palSetPadMode(GPIOB, 7, PAL_MODE_ALTERNATE(4));
+
 	palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
 	palSetPadMode(GPIOA, 5, PAL_MODE_INPUT_ANALOG);
 	dacStart(&DACD1, &daccfg);
@@ -177,6 +186,9 @@ int main(void) {
 	palSetPadMode(GPIOA, 12, PAL_MODE_ALTERNATE(1));
 	init_qei(&GPTD1, 7);
 	init_qei(&GPTD2, 7);
+
+	maintest();
+
 
 	while (true) {
 		chThdSleepMilliseconds(1);
