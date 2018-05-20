@@ -319,6 +319,27 @@ void ssd_putc16_v(char c)
 		ssd_putc16_v_nofix(c);
 }
 
+
+void ssd_puts16(uint8_t line, int8_t col, char *str)
+{
+	ssd_set_line(line);
+	if(col >= 0)
+		ssd_set_col(col);
+	int i, l = strlen(str);
+	for(i=0; i<l; i++)
+	{
+		if(str[i] != '\n')
+			ssd_putc16_v(str[i]);
+		else
+		{
+			line += 2;
+			ssd_set_line(line);
+			while (127 - current_col > 0)
+				ssd_putc16_v(32);
+		}
+	}
+}
+
 void ssd_init(void)
 {
 	Write_Instruction(0xae);//--turn off oled panel

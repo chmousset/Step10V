@@ -176,10 +176,7 @@ static THD_FUNCTION(ThreadOLED, arg)
 		palClearLine(LINE_LED_GREEN);
 		// chsnprintf(buf, 10, "%d",  chVTGetSystemTime());	// feedback.x_cst
 		chsnprintf(buf, 6, "%04d ",  (int) feedback.x_cst);
-
-		ssd_set_col(0);
-		for(i=0; i<5; i++)
-			ssd_putc16_v(buf[i]);
+		ssd_puts16(2, 0, buf);
 	}
 }
 

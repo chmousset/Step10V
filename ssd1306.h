@@ -56,5 +56,6 @@ extern void ssd_clear(void);
 extern void ssd_putc8(char c);
 extern void ssd_contrast(unsigned char mod);
 extern void ssd_putc16_v(char c);
+extern void ssd_puts16(uint8_t line, int8_t col, char *str);
 
 #endif
