@@ -184,28 +184,27 @@ void Write_Datal(uint8_t *dat, int l)
 }
 #endif
 
-// Set page address
-void Set_Page_Address(unsigned char add)
+void ssd_set_line(unsigned char add)
 {
 	current_page = add;
 	add=0xb0|add;
 	Write_Instruction(add);
 }
 
-void Set_Column_Address(unsigned char add)
+void ssd_set_col(unsigned char add)
 {
 	Write_Instruction((0x10|(add>>4)));
 	Write_Instruction((0x0f&add));
 	current_col = add;
 }
 
-void Set_Contrast_Control_Register(unsigned char mod)
+void ssd_contrast(unsigned char mod)
 {
 	Write_Instruction(0x81);
 	Write_Instruction(mod);
 }
 
-void putc8_8(char c)
+void ssd_putc8(char c)
 {
 	int i;
 
@@ -216,22 +215,22 @@ void putc8_8(char c)
 	current_col +=6;
 }
 
-void printf8(uint8_t line, int8_t col, char *str)
+void ssd_puts(uint8_t line, int8_t col, char *str)
 {
-	Set_Page_Address(line);
+	ssd_set_line(line);
 	if(col >= 0)
-		Set_Column_Address(col);
+		ssd_set_col(col);
 	int i, l = strlen(str);
 	for(i=0; i<l; i++)
 	{
 		if(str[i] != '\n')
-			putc8_8(str[i]);
+			ssd_putc8(str[i]);
 		else
 		{
 			while (127 - current_col > 0)
 			{
 				if(127 - current_col >= 8)
-					putc8_8(32);
+					ssd_putc8(32);
 				else
 				{
 					Write_Data(0x00);
@@ -261,63 +260,63 @@ void fix_font_table(void)
 	font_fixed = 1;
 }
 
-void putc16_v_fixed(char c)
+void ssd_putc16_v_fixed(char c)
 {
-	uint8_t i, *font = (uint8_t*) Font16pxBold[c] + 1;
-	uint8_t len = (uint8_t) Font16pxBold[c][0];
+	uint8_t *font = (uint8_t*) Font16pxBold[(uint8_t) c] + 1;
+	uint8_t len = (uint8_t) Font16pxBold[(uint8_t) c][0];
 
-	Set_Page_Address(current_page);
-	Set_Column_Address(current_col);
+	ssd_set_line(current_page);
+	ssd_set_col(current_col);
 	Write_Datal(font, len);
 	Write_Data(0x00);
 	font += len;
 
-	Set_Page_Address(current_page+1);
+	ssd_set_line(current_page+1);
 	current_page--;
-	Set_Column_Address(current_col);
+	ssd_set_col(current_col);
 	Write_Datal(font, len);
 	Write_Data(0x00);
 	current_col = current_col + len + 1;
 }
 
-void putc16_v_nofix(char c)
+void ssd_putc16_v_nofix(char c)
 {
-	Set_Page_Address(current_page);
+	ssd_set_line(current_page);
 	uint8_t i, dat;
 
-	uint8_t charwidth = Font16pxBold[c][0];
+	uint8_t charwidth = Font16pxBold[(uint8_t) c][0];
 	
 
 	for(i=0;i<charwidth;i++)
 	{
-		dat = Font16pxBold[c][i*2+2];
+		dat = Font16pxBold[(uint8_t) c][i*2+2];
 		Write_Data(dat);
 	}
 	Write_Data(0x00);
 
-	// Write_Datal(Font16pxBold[c] + 1, charwidth);
+	// Write_Datal(Font16pxBold[(uint8_t) c] + 1, charwidth);
 
-	Set_Page_Address(current_page+1);
+	ssd_set_line(current_page+1);
 	current_page--;
-	Set_Column_Address(current_col);
+	ssd_set_col(current_col);
 
-	// Write_Datal(Font16pxBold[c] + 2, charwidth);
+	// Write_Datal(Font16pxBold[(uint8_t) c] + 2, charwidth);
 
 	for(i=0;i<charwidth;i++)
 	{
-		dat = Font16pxBold[c][i*2+1];
+		dat = Font16pxBold[(uint8_t) c][i*2+1];
 		Write_Data(dat);
 	}
 	Write_Data(0x00);
 	current_col = current_col + charwidth+1;
 }
 
-void putc16_v(char c)
+void ssd_putc16_v(char c)
 {
 	if(font_fixed)
-		putc16_v_fixed(c);
+		ssd_putc16_v_fixed(c);
 	else
-		putc16_v_nofix(c);
+		ssd_putc16_v_nofix(c);
 }
 
 void ssd_init(void)
@@ -359,16 +358,18 @@ void ssd_init(void)
 	Write_Instruction(0x40);
 
 	Write_Instruction(0xaf);//--turn on oled panel
+
+	ssd_clear();
 }
 
-void Display_Chess(unsigned char value)
+void ssd_test(unsigned char value)
 {
 		unsigned char i,j,k;
 		for(i=0;i<0x4;i++)
 	{
-		Set_Page_Address(i);
+		ssd_set_line(i);
 
-				Set_Column_Address(0x00);
+				ssd_set_col(0x00);
 
 		for(j=0;j<0x10;j++)
 		{
@@ -380,14 +381,14 @@ void Display_Chess(unsigned char value)
 	}
 }
 
-void Display_clear()
+void ssd_clear(void)
 {
 		unsigned char i,j,k;
 		for(i=0;i<0x4;i++)
 	{
-		Set_Page_Address(i);
+		ssd_set_line(i);
 
-				Set_Column_Address(0x00);
+				ssd_set_col(0x00);
 
 		for(j=0;j<0x10;j++)
 		{
@@ -401,20 +402,19 @@ void Display_clear()
 
 void maintest(void)
 {
-	int cnt;
+	unsigned int cnt;
 	fix_font_table();
 	ssd_init();
-	Display_clear();
 
-	printf8(2, 0, "Line 2");
-	printf8(3, 0, "Line 3");
+	ssd_puts(2, 0, "Line 2");
+	ssd_puts(3, 0, "Line 3");
 
 	char string[] = "IP=192.168.0.123\n";
 
-	Set_Page_Address(2);
-	Set_Column_Address(0);
+	ssd_set_line(2);
+	ssd_set_col(0);
 	for(cnt=0; cnt<strlen(string); cnt++)
 	{
-		putc16_v(string[cnt]);
+		ssd_putc16_v(string[cnt]);
 	}
 }

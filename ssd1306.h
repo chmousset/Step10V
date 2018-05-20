@@ -45,15 +45,16 @@
 #define SSD_I2C_DRIVER		(&I2CD3)
 #endif
 
-extern void Write_Instruction(unsigned char cmd);
-extern void Write_Data(unsigned char  dat);
-extern void Write_Datal(uint8_t *dat, int l);
-extern void Set_Page_Address(unsigned char add);
-extern void Set_Column_Address(unsigned char add);
+extern void ssd_set_line(unsigned char add);
+extern void ssd_set_col(unsigned char add);
 extern void Set_Contrast_Control_Register(unsigned char mod);
 
 extern void ssd_init(void);
-extern void Display_Chess(unsigned char value);
+extern void ssd_test(unsigned char value);
 extern void maintest(void);
+extern void ssd_clear(void);
+extern void ssd_putc8(char c);
+extern void ssd_contrast(unsigned char mod);
+extern void ssd_putc16_v(char c);
 
 #endif

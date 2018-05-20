@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <stdlib.h>
 #include "ch.h"
 #include "hal.h"
 #include "rt_test_root.h"
@@ -19,6 +20,8 @@
 
 #include "shell_cmds.h"
 #include "sigf.h"
+#include "ssd1306.h"
+#include "chprintf.h"
 
 static const DACConfig daccfg = {
   .init         = 0U,
@@ -53,8 +56,8 @@ void dac_out(int32_t dac)
 }
 
 // PID Control Loop
-struct signal_float setpoint = {.x = NULL, .x_var = NULL, .x_cst = 0.0, .params = NULL};
-struct signal_float feedback = {.x = NULL, .x_var = NULL, .x_cst = 0.0, .params = NULL};
+struct signal_float setpoint = SIG_CST(0.0);
+struct signal_float feedback = SIG_CST(0.0);
 
 
 struct sig_pid_param_f pid_p= {
@@ -68,12 +71,7 @@ struct sig_pid_param_f pid_p= {
 	.setpoint = &setpoint,
 	.feedback = &feedback
 };
-struct signal_float pid = {
-	.x = (sig_func_f)sig_pid_opt_f,
-	.x_var = NULL,
-	.x_cst = 0.0,
-	.params = (void*)&pid_p
-};
+struct signal_float pid = SIG_FN((sig_func_f)sig_pid_opt_f, &pid_p);
 
 bool update_pid_params = 1;
 
@@ -161,6 +159,30 @@ void init_stepdir(GPTDriver *drv, uint8_t filter)
 	drv->tim->CR1  = TIM_CR1_URS | TIM_CR1_CEN;		// start the counter
 }
 
+// Display loop
+static THD_WORKING_AREA(waThreadOLED, 1024);
+static THD_FUNCTION(ThreadOLED, arg)
+{
+	int i;
+	char buf[10];
+	(void)arg;
+	chRegSetThreadName("oled");
+	ssd_init();
+
+	ssd_set_line(2);
+	while (true) {
+		palSetLine(LINE_LED_GREEN);
+		chThdSleepMilliseconds(50);
+		palClearLine(LINE_LED_GREEN);
+		// chsnprintf(buf, 10, "%d",  chVTGetSystemTime());	// feedback.x_cst
+		chsnprintf(buf, 6, "%04d ",  (int) feedback.x_cst);
+
+		ssd_set_col(0);
+		for(i=0; i<5; i++)
+			ssd_putc16_v(buf[i]);
+	}
+}
+
 int main(void) {
 	halInit();
 	chSysInit();
@@ -168,12 +190,10 @@ int main(void) {
 	sdStart(&SD2, NULL);
 	start_shell();
 
-	// i2cStart(&I2CD1, &i2c_cfg);
+
 	i2cStart(&I2CD3, &i2c_cfg);
 	palSetPadMode(GPIOB, 4, PAL_MODE_ALTERNATE(4));
 	palSetPadMode(GPIOA, 7, PAL_MODE_ALTERNATE(4));
-	// palSetPadMode(GPIOB, 6, PAL_MODE_ALTERNATE(4));
-	// palSetPadMode(GPIOB, 7, PAL_MODE_ALTERNATE(4));
 
 	palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
 	palSetPadMode(GPIOA, 5, PAL_MODE_INPUT_ANALOG);
@@ -187,12 +207,10 @@ int main(void) {
 	init_qei(&GPTD1, 7);
 	init_qei(&GPTD2, 7);
 
-	maintest();
-
+	chThdCreateStatic(waThreadOLED, sizeof(waThreadOLED), NORMALPRIO, ThreadOLED, NULL);
 
 	while (true) {
 		chThdSleepMilliseconds(1);
 		ctl_loop();
-		// chprintf(&SD2, "%d %d %d\r\n", GPTD1.tim->CNT, GPTD2.tim->CNT, error);
 	}
 }
