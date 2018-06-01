@@ -18,44 +18,46 @@ The external UART can be connected to FTDI cable through an isolator board, so t
 
 # Pinout
 
-**QEI from amplifier**
-PA0 - TIM2_CH1
-PA1 - TIM2_CH2
-(PA3 - TIM2_CH3)
+**QEI from amplifier**  
+* PA0 - TIM2_CH1 = QEI2 A
+* PA1 - TIM2_CH2 = QEI2 B
+* TODO:(PA3 - TIM2_CH3 = QEI2 I)
 
-**QEI / step-dir from cnc**
-PA8 - TIM1_CH1
-PA9 - TIM1_CH2
-PA12 - TIM1_ETR
+**QEI / step-dir from cnc**  
+* PA8 - TIM1_CH1 = QEI1 A / STEP
+* PA9 - TIM1_CH2 = QEI1 B / DIR
 
-**Analog output**
-PA4 - DAC1_OUT1
-PA5 - DAC1_OUT2
+**Analog output**  
+* PA4 - DAC1_OUT1
+* PA5 - DAC1_OUT2
 
+**Internal UART (debugger)**  
+* PA2 - RX
+* PA15 - TX
 
-**Internal UART (debugger)**
-PA2 - RX
-PA15 - TX
+TODO:**External UART**  
+* PB6 - TX
+* PB7 - RX
 
-**External UART**
-PB6 - TX
-PB7 - RX
+**LEDs**  
+* PB3 - Green LED
 
-**LEDs**
-PB3 - Green LED
+TODO:**USB**  
+* PA11 - USB_DM
+* PA12 - USB_DP
 
-**USB**
-PA11 - USB_DM
-PA12 - USB_DP (conflicts TIM1_ETR, so it's only for bootloader)
+**OLED Screen**  
+* PB4 - SDA SSD1306
+* PA7 - SCL SSD1306
 
 # Innerworking
 ## Main (startup)
 The Main function only performs the init
-* Read config
+* TODO:Read config
 * Performs peripherals init
 * Starts the Shell Thread
 * Starts the control loop
-* Starts the Watchdog
+* TODO:Starts the Watchdog
 
 ## Control loop
 The PID loop is fired from a timer interrupt at regular interval. The interrupt has the highest priority so the PID loop has very low jitter.
@@ -65,12 +67,12 @@ This loop performs the current operations:
 * Performs error calculation
 * Performs limits / error checks
 * Checks for state (enabled, disabled, error) of the regulator
-* Performs PID conculation (floating point, using the intenal FPU)
+* Performs PID calculation (floating point, using the intenal FPU)
 * Updates the DAC outputs
 * Updates status variables
 * Resets Watchdog
 
-## Watchdog
+## TODO:Watchdog
 If the Watchdog is not triggered during the right interval, the output is put in a safe mode (output = 0V, FAULT=1).
 
 ## Shell
@@ -78,3 +80,8 @@ The shell is the main configuration interface. It allows to
 * Read status
 * Read/Write configuration
 * Perform a step response test
+
+# Project Status
+This project is in early stage, it's actually closer to a Proof Of Concept than a finished product.
+
+There is still a lot to do before I would consider this being ready for any serious work. Experiment at your own risks; but make sure you know what you are doing!
