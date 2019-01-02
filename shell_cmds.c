@@ -19,13 +19,9 @@
 #include "shell.h"
 #include "shell_cmds.h"
 #include "sigf.h"
-<<<<<<< HEAD
 #include <stdlib.h>
-=======
 #include "cfg.h"
-#include <stdlib.h>
 #include <string.h>
->>>>>>> 9d5a3c46c71cae9096f0bebcb5f4262b27e55910
 
 char ABOUT[] = "Step10V  Copyright (C) 2018  Charles-Henri Mousset\r\n\
 https://github.com/chmousset/Step10V\r\n\
@@ -58,12 +54,7 @@ float stof(const char* s){
 
 void about(BaseSequentialStream *chp, int argc, char *argv[])
 {
-<<<<<<< HEAD
-	(void) argc;
-	(void) argv;
-=======
 	(void)argc; (void)argv;
->>>>>>> 9d5a3c46c71cae9096f0bebcb5f4262b27e55910
 	chprintf(chp, ABOUT);
 }
 
