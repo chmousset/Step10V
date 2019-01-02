@@ -23,6 +23,14 @@
 #include "ssd1306.h"
 #include "chprintf.h"
 #include "ctrloop.h"
+#include "canbus.h"
+
+
+static const DACConfig daccfg = {
+  .init         = 0U,
+  .datamode     = DAC_DHRM_12BIT_RIGHT_DUAL,
+  .cr           = 0
+};
 
 static const I2CConfig i2c_cfg = {
 	STM32_TIMINGR_PRESC(0U) |
@@ -58,10 +66,11 @@ void init_qei(GPTDriver *drv, uint8_t filter)
 	drv->tim->DIER = 0;
 	drv->tim->EGR  = TIM_EGR_UG;             // Re-initialize the counter
 	drv->tim->CNT  = 0;                      // Reset counter
+	drv->tim->CCMR1 = (TIM_CCMR1_IC1F_Msk & (filter << TIM_CCMR1_IC1F_Pos));
 	drv->tim->SMCR = ( TIM_SMCR_SMS_Msk & (0b11 << TIM_SMCR_SMS_Pos) );
 	drv->tim->SR   = 0;                      // Clear pending IRQs (if any)
 	drv->tim->CCER = 0;
-	drv->tim->CCMR2 = TIM_CCMR2_CC3S_0;		// capture CC3 on CH3, (TIM_CCMR2_IC3F_0 2 samples filter)
+	drv->tim->CCMR2 = TIM_CCMR2_CC3S_0;		// capture CC3 on CH3, 2 samples filter
 	drv->tim->CCER = TIM_CCER_CC3E;			// rising edge
 	drv->tim->CR1  = TIM_CR1_URS | TIM_CR1_CEN;		// start the counter
 }
@@ -81,9 +90,9 @@ void init_stepdir(GPTDriver *drv, uint8_t filter)
 						( TIM_SMCR_ETF_Msk & (filter << TIM_SMCR_ETF_Pos)) |
 						( TIM_SMCR_TS_Msk & (0b101 << TIM_SMCR_TS_Pos));
 	drv->tim->SR   = 0;                      // Clear pending IRQs (if any)
-	// drv->tim->CCER = 0;
-	// drv->tim->CCMR2 = TIM_CCMR2_CC3S_0;		// capture CC3 on CH3, (TIM_CCMR2_IC3F_0 2 samples filter)
-	// drv->tim->CCER = TIM_CCER_CC3E;			// rising edge
+	drv->tim->CCER = 0;
+	drv->tim->CCMR2 = TIM_CCMR2_CC3S_0;		// capture CC3 on CH3, (TIM_CCMR2_IC3F_0 2 samples filter)
+	drv->tim->CCER = TIM_CCER_CC3E;			// rising edge
 	drv->tim->CR1  = TIM_CR1_URS | TIM_CR1_CEN;		// start the counter
 }
 
@@ -94,6 +103,7 @@ static THD_FUNCTION(ThreadOLED, arg)
 	char buf[10];
 	(void)arg;
 	chRegSetThreadName("oled");
+	chThdSleepMilliseconds(100);
 	ssd_init();
 
 	ssd_set_line(2);
@@ -128,6 +138,8 @@ int main(void) {
 	init_ctrloop();
 
 	chThdCreateStatic(waThreadOLED, sizeof(waThreadOLED), NORMALPRIO, ThreadOLED, NULL);
+
+	canBus_init();
 
 	while (true) {
 		chThdSleepMilliseconds(100);

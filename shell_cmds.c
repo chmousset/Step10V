@@ -19,7 +19,13 @@
 #include "shell.h"
 #include "shell_cmds.h"
 #include "sigf.h"
+<<<<<<< HEAD
 #include <stdlib.h>
+=======
+#include "cfg.h"
+#include <stdlib.h>
+#include <string.h>
+>>>>>>> 9d5a3c46c71cae9096f0bebcb5f4262b27e55910
 
 char ABOUT[] = "Step10V  Copyright (C) 2018  Charles-Henri Mousset\r\n\
 https://github.com/chmousset/Step10V\r\n\
@@ -52,8 +58,12 @@ float stof(const char* s){
 
 void about(BaseSequentialStream *chp, int argc, char *argv[])
 {
+<<<<<<< HEAD
 	(void) argc;
 	(void) argv;
+=======
+	(void)argc; (void)argv;
+>>>>>>> 9d5a3c46c71cae9096f0bebcb5f4262b27e55910
 	chprintf(chp, ABOUT);
 }
 
@@ -110,6 +120,7 @@ void enable(BaseSequentialStream *chp, int argc, char *argv[])
 {
 	(void) argv;
 	(void) argc;
+	(void) chp;
 
 	loop_enable = 1;
 	chprintf(chp, "Ctrl loop enabled\r\n");
@@ -119,9 +130,145 @@ void disable(BaseSequentialStream *chp, int argc, char *argv[])
 {
 	(void) argv;
 	(void) argc;
+	(void) chp;
 
 	loop_enable = 0;
 	chprintf(chp, "Ctrl loop disabled\r\n");
+}
+
+
+struct can_instance {
+  CANDriver     *canp;
+  ioline_t      led;
+};
+
+
+
+void canTx(BaseSequentialStream *chp, int argc, char *argv[])
+{
+	(void)argc; (void)argv; (void)chp;
+	// canSend()
+}
+
+cfg_t cfg;
+
+void cfg_term_disp_int(int *val, int min, int max, int idx, BaseSequentialStream *chp)
+{
+	(void)min; (void)max;
+	chprintf(chp, "[%3d]%s = %d\r\n", idx, cfg_names[idx], *val);
+}
+void cfg_term_disp_uint32_t(uint32_t *val, uint32_t min, uint32_t max, int idx, BaseSequentialStream *chp)
+{
+	(void)min; (void)max;
+	chprintf(chp, "[%3d]%s = %u\r\n", idx, cfg_names[idx], *val);
+}
+void cfg_term_disp_bool(bool *val, bool min, bool max, int idx, BaseSequentialStream *chp)
+{
+	(void)min; (void)max;
+	chprintf(chp, "[%3d]%s = %s\r\n", idx, cfg_names[idx], *val ? "True" : "False");
+}
+void cfg_term_disp_float(float *val, float min, float max, int idx, BaseSequentialStream *chp)
+{
+	(void)min; (void)max;
+	chprintf(chp, "[%3d]%s = %f\r\n", idx, cfg_names[idx], *val);
+}
+void cfg_term_disp_notfound(BaseSequentialStream *chp)
+{
+	chprintf(chp, "config variable not found!\r\n");
+}
+
+void cfg_term_save_int(int *val, int min, int max, int idx, BaseSequentialStream *chp, char *value)
+{
+	int v = atoi(value);
+	if( (v > max) || (v < min) )
+	{
+		chprintf(chp, "Out of range [%d,%d]!\r\n", min, max);
+		return;
+	}
+	*val = v;
+	chprintf(chp, "%s = %d\r\n", cfg_names[idx], *val);
+}
+void cfg_term_save_uint32_t(uint32_t *val, uint32_t min, uint32_t max, int idx, BaseSequentialStream *chp, char *value)
+{
+	uint32_t v = atoi(value);
+	if( (v > max) || (v < min) )
+	{
+		chprintf(chp, "Out of range [%d,%d]!\r\n", min, max);
+		return;
+	}
+	*val = v;
+	chprintf(chp, "%s = %u\r\n", cfg_names[idx], *val);
+}
+void cfg_term_save_bool(bool *val, bool min, bool max, int idx, BaseSequentialStream *chp, char *value)
+{
+	(void)min; (void)max;
+	bool b = false;
+	if(atoi(value) == 1)
+		b = true;
+	else if(strcmp("true", value) == 0)
+		b = true;
+	else if(strcmp("True", value) == 0)
+		b = true;
+	else if(strcmp("TRUE", value) == 0)
+		b = true;
+	*val = b;
+	chprintf(chp, "%s = %s\r\n", cfg_names[idx], *val ? "True" : "False");
+}
+void cfg_term_save_float(float *val, float min, float max, int idx, BaseSequentialStream *chp, char *value)
+{
+	float v = atof(value);
+	if( (v > max) || (v < min) )
+	{
+		chprintf(chp, "Out of range [%f,%f]!\r\n", min, max);
+		return;
+	}
+	*val = v;
+	chprintf(chp, "%s = %f\r\n", cfg_names[idx], *val);
+}
+
+void cfg_term_save_notfound(BaseSequentialStream *chp, char *value)
+{
+	(void)value;
+	chprintf(chp, "config variable not found!\r\n");
+}
+
+void shl_cfg(BaseSequentialStream *chp, int argc, char *argv[])
+{
+	int i;
+	if(argc == 0)
+	{
+		for(i=0; i<CFG_CNT; i++)
+		{
+			chprintf(chp, "%d : ", cfg_ids[i]);
+			CFGH_ID_TERM_DISP((&cfg), cfg_ids[i], chp);
+			chprintf(chp, "  %s\r\n", cfg_descriptions[i]);
+			// chprintf(chp, "%3d %s : %s\r\n", cfg_ids[i], cfg_names[i], cfg_descriptions[i]);
+		}
+	}
+	if(argc == 1)
+	{
+		i = atoi(argv[0]);
+		if(i > 0)
+		{
+			CFGH_ID_TERM_DISP((&cfg), i, chp);
+		}
+		else
+		{
+			CFGH_NAME_TERM_DISP((&cfg), argv[0], chp);
+		}
+	}
+	if(argc == 2)
+	{
+		i = atoi(argv[0]);
+		if(i > 0)
+		{
+			CFGH_ID_TERM_SAVE((&cfg), i, chp, argv[1]);
+		}
+		else
+		{
+			CFGH_NAME_TERM_SAVE((&cfg), argv[0], chp, argv[1]);
+		}
+	}
 }
 
 static const ShellCommand commands[] = {
@@ -132,6 +279,7 @@ static const ShellCommand commands[] = {
 	{"d", d},
 	{"enable", enable},
 	{"disable", disable},
+	{"cfg", shl_cfg},
 	{NULL, NULL}
 };
 

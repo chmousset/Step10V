@@ -133,6 +133,7 @@ CSRC = $(ALLCSRC) \
        ssd1306.c \
        Font16px.c \
        ctrloop.c \
+       canbus.c \
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -232,3 +233,7 @@ ULIBS =
 
 RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC
 include $(RULESPATH)/rules.mk
+
+# configuration generator
+cfg.h: cfg.csv cfg2c.py
+	python cfg2c.py cfg.csv --instances cfg --handlers term_save term_disp

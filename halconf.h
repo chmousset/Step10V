@@ -23,7 +23,7 @@
 
 #define HAL_USE_PAL                         TRUE
 #define HAL_USE_ADC                         FALSE
-#define HAL_USE_CAN                         FALSE
+#define HAL_USE_CAN                         TRUE
 #define HAL_USE_CRY                         FALSE
 #define HAL_USE_DAC                         TRUE
 #define HAL_USE_EXT                         FALSE
