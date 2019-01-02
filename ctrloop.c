@@ -22,6 +22,13 @@ static const DACConfig daccfg = {
   .cr           = 0
 };
 
+static const GPTConfig gpt7cfg = {
+	.frequency =  1E6,
+	.callback  =  ctl_loop,
+	.cr2       =  0,
+	.dier      =  0U
+};
+
 
 bool loop_enable = 1;
 
@@ -61,8 +68,9 @@ struct signal_float pid = SIG_FN((sig_func_f)sig_pid_opt_f, &pid_p);
 
 bool update_pid_params = 1;
 
-void ctl_loop(void)
+void ctl_loop(GPTDriver *drv)
 {
+	(void) drv;
 	static int16_t cnt1, old_cnt1 = 0;
 	static int32_t cnt2, old_cnt2 = 0;
 	static int32_t error = 0;
@@ -98,4 +106,6 @@ void init_ctrloop(void)
 	palSetPadMode(GPIOA, 5, PAL_MODE_INPUT_ANALOG);
 	dacStart(&DACD1, &daccfg);
 
+	gptStart(&GPTD7, &gpt7cfg);
+	gptStartContinuous(&GPTD7, 200);	// 5kHz loop
 }

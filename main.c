@@ -130,7 +130,6 @@ int main(void) {
 	chThdCreateStatic(waThreadOLED, sizeof(waThreadOLED), NORMALPRIO, ThreadOLED, NULL);
 
 	while (true) {
-		chThdSleepMilliseconds(1);
-		ctl_loop();
+		chThdSleepMilliseconds(100);
 	}
 }

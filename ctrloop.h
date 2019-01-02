@@ -18,8 +18,9 @@
 #include "sigf.h"
 
 extern struct signal_float feedback;
+extern bool loop_enable;
 
-void ctl_loop(void);
+void ctl_loop(GPTDriver *drv);
 void init_ctrloop(void);
 
 #endif
