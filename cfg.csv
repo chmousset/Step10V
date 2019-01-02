@@ -1,0 +1,13 @@
+id,name,type,default,min,max,description
+10,app,int,0,0,2,App to run at start
+20,cpr_1,uint32_t,1,1,32768,"Counts Per Revolution,Sensor 1"
+21,cpr_2,uint32_t,1,1,32768,"Counts Per Revolution,Sensor 2"
+22,invert_1,bool,false,false,true,Invert Sensor 1
+23,invert_2,bool,false,false,true,Invert Sensor 2
+24,invert_o,bool,false,false,true,Invert Output
+30,lim_o,float,100.0,0.0,100.0,Output limit
+40,home_sw_no,bool,true,false,true,Home Switch Normally Open (Normally Closed if Flase)
+41,limit_sw_no,bool,true,false,true,Limit Switch Normally Open (Normally Closed if Flase)
+50,p,float,0.0,-1000000000,1000000000,"PID controller Gain,Proportional"
+51,i,float,0.0,-1000000000,1000000000,"PID controller Gain,Integral"
+52,d,float,0.0,-1000000000,1000000000,"PID controller Gain,Derivative"

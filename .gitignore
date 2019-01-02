@@ -1,2 +1,5 @@
 build/
 .dep/
+cfg.c
+cfg.h
+__pycache__/
