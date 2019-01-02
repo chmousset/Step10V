@@ -128,13 +128,6 @@ void disable(BaseSequentialStream *chp, int argc, char *argv[])
 }
 
 
-struct can_instance {
-  CANDriver     *canp;
-  ioline_t      led;
-};
-
-
-
 void canTx(BaseSequentialStream *chp, int argc, char *argv[])
 {
 	(void)argc; (void)argv; (void)chp;

@@ -16,6 +16,22 @@
 #if !defined(CANBUS_H)
 #define CANBUS_H
 
+#include "cfg.h"
+
+extern cfg_t cfg;
+
+enum CAN_FN {
+	CAN_READ_CFG = 1,
+	CAN_WRITE_CFG = 2,
+	CAN_PD_BROADCAST = 3
+};
+
 void canBus_init(void);
+
+void cfg_can_read_int(int *val, int min, int max, int idx, CANRxFrame *can_rx_frame);
+void cfg_can_read_uint32_t(uint32_t *val, uint32_t min, uint32_t max, int idx, CANRxFrame *can_rx_frame);
+void cfg_can_read_bool(bool *val, bool min, bool max, int idx, CANRxFrame *can_rx_frame);
+void cfg_can_read_float(float *val, float min, float max, int idx, CANRxFrame *can_rx_frame);
+void cfg_can_read_notfound(CANRxFrame *can_rx_frame);
 
 #endif
