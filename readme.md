@@ -17,6 +17,7 @@ The external UART can be connected to FTDI cable through an isolator board, so t
 
 
 # Pinout
+![Nucleo32L432KC](/doc/Nucleo_pinout.png)
 
 **QEI from amplifier**  
 * PA0 - TIM2_CH1 = QEI2 A
