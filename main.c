@@ -163,7 +163,6 @@ void init_stepdir(GPTDriver *drv, uint8_t filter)
 static THD_WORKING_AREA(waThreadOLED, 1024);
 static THD_FUNCTION(ThreadOLED, arg)
 {
-	int i;
 	char buf[10];
 	(void)arg;
 	chRegSetThreadName("oled");

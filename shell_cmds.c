@@ -19,6 +19,7 @@
 #include "shell.h"
 #include "shell_cmds.h"
 #include "sigf.h"
+#include <stdlib.h>
 
 char ABOUT[] = "Step10V  Copyright (C) 2018  Charles-Henri Mousset\r\n\
 https://github.com/chmousset/Step10V\r\n\
@@ -51,6 +52,8 @@ float stof(const char* s){
 
 void about(BaseSequentialStream *chp, int argc, char *argv[])
 {
+	(void) argc;
+	(void) argv;
 	chprintf(chp, ABOUT);
 }
 
@@ -109,6 +112,7 @@ void enable(BaseSequentialStream *chp, int argc, char *argv[])
 	(void) argc;
 
 	loop_enable = 1;
+	chprintf(chp, "Ctrl loop enabled\r\n");
 }
 
 void disable(BaseSequentialStream *chp, int argc, char *argv[])
@@ -117,6 +121,7 @@ void disable(BaseSequentialStream *chp, int argc, char *argv[])
 	(void) argc;
 
 	loop_enable = 0;
+	chprintf(chp, "Ctrl loop disabled\r\n");
 }
 
 static const ShellCommand commands[] = {
