@@ -22,6 +22,8 @@
 #include "sigf.h"
 #include "ssd1306.h"
 #include "chprintf.h"
+#include "canbus.h"
+
 
 static const DACConfig daccfg = {
   .init         = 0U,
@@ -204,7 +206,9 @@ int main(void) {
 	init_qei(&GPTD1, 7);
 	init_qei(&GPTD2, 7);
 
-	chThdCreateStatic(waThreadOLED, sizeof(waThreadOLED), NORMALPRIO, ThreadOLED, NULL);
+	chThdCreateStatic(waThreadOLED, sizeof(waThreadOLED), NORMALPRIO-1, ThreadOLED, NULL);
+
+	canBus_init();
 
 	while (true) {
 		chThdSleepMilliseconds(1);
