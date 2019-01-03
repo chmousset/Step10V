@@ -162,7 +162,7 @@ void cfg_can_save_int(int *val, int min, int max, int idx, CANRxFrame *can_rx_fr
 		unsigned int i;
 		__typeof__(*val) tmp = 0;
 		for(i=0; i<sizeof(int); i++)
-			tmp = (tmp << 8) | can_rx_frame->data8[2+i];
+			tmp |= ((__typeof__(*val)) can_rx_frame->data8[2+i]) << (8*i);
 		if((tmp <= max) && (tmp >= min))
 		{
 			*val = tmp;
@@ -187,7 +187,7 @@ void cfg_can_save_uint32_t(uint32_t *val, uint32_t min, uint32_t max, int idx, C
 		unsigned int i;
 		__typeof__(*val) tmp = 0;
 		for(i=0; i<sizeof(int); i++)
-			tmp = (tmp << 8) | can_rx_frame->data8[2+i];
+			tmp |= ((__typeof__(*val)) can_rx_frame->data8[2+i]) << (8*i);
 		if((tmp <= max) && (tmp >= min))
 		{
 			*val = tmp;
