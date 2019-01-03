@@ -33,6 +33,8 @@ Published under the GNU General Public License, version 3 of the License\r\n\
 You should have received a copy of the GNU General Public License along with\r\n\
 this program. If not, see <https://www.gnu.org/licenses/>.\r\n";
 
+cfg_t cfg;
+
 float stof(const char* s){
 	float rez = 0, fact = 1;
 	if (*s == '-'){
@@ -79,35 +81,6 @@ void dac(BaseSequentialStream *chp, int argc, char *argv[])
 
 }
 
-
-void p(BaseSequentialStream *chp, int argc, char *argv[])
-{
-	if(argc == 1)
-	{
-		pid_p.p = stof(argv[0]);
-		update_pid_params = true;
-	}
-	chprintf(chp, "p= %f\r\n", pid_p.p);
-}
-void i(BaseSequentialStream *chp, int argc, char *argv[])
-{
-	if(argc == 1)
-	{
-		pid_p.i = stof(argv[0]);
-		update_pid_params = true;
-	}
-	chprintf(chp, "i= %f\r\n", pid_p.i);
-}
-void d(BaseSequentialStream *chp, int argc, char *argv[])
-{
-	if(argc == 1)
-	{
-		pid_p.d = stof(argv[0]);
-		update_pid_params = true;
-	}
-	chprintf(chp, "d= %f\r\n", pid_p.d);
-}
-
 void enable(BaseSequentialStream *chp, int argc, char *argv[])
 {
 	(void) argv;
@@ -127,15 +100,6 @@ void disable(BaseSequentialStream *chp, int argc, char *argv[])
 	loop_enable = 0;
 	chprintf(chp, "Ctrl loop disabled\r\n");
 }
-
-
-void canTx(BaseSequentialStream *chp, int argc, char *argv[])
-{
-	(void)argc; (void)argv; (void)chp;
-	// canSend()
-}
-
-cfg_t cfg;
 
 void cfg_term_disp_int(int *val, int min, int max, int idx, BaseSequentialStream *chp)
 {
@@ -268,9 +232,6 @@ void shl_cfg(BaseSequentialStream *chp, int argc, char *argv[])
 static const ShellCommand commands[] = {
 	{"about", about},
 	{"dac", dac},
-	{"p", p},
-	{"i", i},
-	{"d", d},
 	{"enable", enable},
 	{"disable", disable},
 	{"cfg", shl_cfg},

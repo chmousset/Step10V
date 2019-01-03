@@ -6,7 +6,7 @@ id,name,type,default,min,max,description
 22,invert_1,bool,false,false,true,Invert Sensor 1
 23,invert_2,bool,false,false,true,Invert Sensor 2
 24,invert_o,bool,false,false,true,Invert Output
-30,lim_o,float,100.0,0.0,100.0,Output limit
+30,lim_o,float,4095.0,0.0,100.0,Output limit
 40,home_sw_no,bool,true,false,true,Home Switch Normally Open (Normally Closed if Flase)
 41,limit_sw_no,bool,true,false,true,Limit Switch Normally Open (Normally Closed if Flase)
 50,p,float,0.0,-1000000000,1000000000,"PID controller Gain,Proportional"

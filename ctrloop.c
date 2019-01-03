@@ -15,6 +15,8 @@
 #include "ch.h"
 #include "hal.h"
 #include "ctrloop.h"
+#include "cfg.h"
+extern cfg_t cfg;
 
 static const DACConfig daccfg = {
   .init         = 0U,
@@ -123,6 +125,14 @@ struct sig_pid_param_f pid_p= {
 struct signal_float pid = SIG_FN((sig_func_f)sig_pid_opt_f, &pid_p);
 
 bool update_pid_params = 1;
+inline void update_params(void)
+{
+	pid_p.p = cfg.p;
+	pid_p.i = cfg.i;
+	pid_p.d = cfg.d;
+	pid_p.max_output = cfg.lim_o;
+	sig_pid_compute_k_f(&pid);
+}
 
 void ctl_loop(GPTDriver *drv)
 {
@@ -145,7 +155,7 @@ void ctl_loop(GPTDriver *drv)
 	if(update_pid_params)
 	{
 		update_pid_params = FALSE;
-		sig_pid_compute_k_f(&pid);
+		update_params();
 	}
 
 	// feeding the error into the feedback with setpoint = 0
