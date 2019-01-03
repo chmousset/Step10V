@@ -21,9 +21,11 @@
 extern cfg_t cfg;
 
 enum CAN_FN {
-	CAN_READ_CFG = 1,
-	CAN_WRITE_CFG = 2,
-	CAN_PD_BROADCAST = 3
+	CAN_READ_CFG_REQUEST = 1,
+	CAN_READ_CFG = 2,
+	CAN_WRITE_CFG = 3,
+	CAN_WRITE_CFG_ACK = 4,
+	CAN_PD_BROADCAST = 5
 };
 
 void canBus_init(void);

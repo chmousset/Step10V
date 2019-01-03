@@ -41,7 +41,12 @@ static THD_FUNCTION(can_rx, p) {
 			continue;
 		while (canReceive(&CAND1, CAN_ANY_MAILBOX,
 						  &rxmsg, TIME_IMMEDIATE) == MSG_OK) {
-			if(rxmsg.data8[1] == CAN_READ_CFG)
+			chprintf((BaseSequentialStream *)&SD2, "Got CAN frame %03X %d", rxmsg.SID, rxmsg.DLC);
+			int i;
+			for(i=0; i<rxmsg.DLC; i++)
+				chprintf((BaseSequentialStream *)&SD2, " %02X", rxmsg.data8[i]);
+			chprintf((BaseSequentialStream *)&SD2, "\r\n");
+			if(rxmsg.SID == cfg.can_id && rxmsg.data8[0] == CAN_READ_CFG_REQUEST)
 				CFGH_ID_CAN_READ(&cfg, rxmsg.data8[1], &rxmsg);
 		}
 	}
@@ -81,15 +86,15 @@ void canBus_init(void)
 
 	chThdCreateStatic(can_rx1_wa, sizeof(can_rx1_wa), NORMALPRIO + 7,
 					can_rx, (void *)&CAND1);
-	chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7,
-				can_tx, NULL);
+	// chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7,
+	// 			can_tx, NULL);
 	chprintf((BaseSequentialStream *)&SD2, "done\r\n");
 }
 
 inline void cfg_read_prepare(CANRxFrame *rx, CANTxFrame *tx)
 {
-	tx->IDE = 0;
-	tx->RTR = 0;
+	tx->IDE = CAN_IDE_STD;
+	tx->RTR = CAN_RTR_DATA;
 	tx->SID = cfg.can_id;
 	tx->data8[0] = CAN_READ_CFG;
 	tx->data8[1] = rx->data8[1];	// ID of the cfg variable
