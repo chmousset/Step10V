@@ -1,5 +1,5 @@
 id,name,type,default,min,max,description
-1,can_id,int,1,2047,1,CAN ID
+1,can_id,int,1,1,2047,CAN ID
 10,app,int,0,0,2,App to run at start
 20,cpr_1,uint32_t,1,1,32768,"Counts Per Revolution,Sensor 1"
 21,cpr_2,uint32_t,1,1,32768,"Counts Per Revolution,Sensor 2"
