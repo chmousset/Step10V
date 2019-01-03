@@ -60,6 +60,7 @@ def header_gen(args, cfg, cfg_l):
 		yield '\t' + c['type'] + ' ' + c['name'] + '; //!> ' + c['description']
 	yield '}} {}_t;'.format(args.out)
 	yield ""
+	yield "extern void {0}_setdefaults({0}_t *cfg);".format(args.out)
 
 	yield "#define {}_CNT {}".format(args.out.upper(), len(cfg_l['names']))
 	if(args.wid):
@@ -93,6 +94,12 @@ def source_gen(args, cfg, cfg_l):
 	if(args.wdescriptions):
 		yield "char *{}_descriptions[] = {{ \"{}\" }};".format(args.out,
 											'", "'.join(cfg_l['descriptions']))
+
+	yield "void {0}_setdefaults({0}_t *cfg) {{".format(args.out)
+	for c in cfg:
+		yield "\tcfg->{0} = {1};".format(c["name"], c["default"])
+	yield "}"
+	yield ""
 
 if __name__ == "__main__":
 
