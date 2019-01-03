@@ -138,23 +138,23 @@ cfg_t cfg;
 
 void cfg_term_disp_int(int *val, int min, int max, int idx, BaseSequentialStream *chp)
 {
-	(void)min; (void)max;
-	chprintf(chp, "[%3d]%s = %d\r\n", idx, cfg_names[idx], *val);
+	(void)min; (void)max; (void) idx;
+	chprintf(chp, "%s = %d\r\n", cfg_names[idx], *val);
 }
 void cfg_term_disp_uint32_t(uint32_t *val, uint32_t min, uint32_t max, int idx, BaseSequentialStream *chp)
 {
-	(void)min; (void)max;
-	chprintf(chp, "[%3d]%s = %u\r\n", idx, cfg_names[idx], *val);
+	(void)min; (void)max; (void) idx;
+	chprintf(chp, "%s = %u\r\n", cfg_names[idx], *val);
 }
 void cfg_term_disp_bool(bool *val, bool min, bool max, int idx, BaseSequentialStream *chp)
 {
-	(void)min; (void)max;
-	chprintf(chp, "[%3d]%s = %s\r\n", idx, cfg_names[idx], *val ? "True" : "False");
+	(void)min; (void)max; (void) idx;
+	chprintf(chp, "%s = %s\r\n", cfg_names[idx], *val ? "True" : "False");
 }
 void cfg_term_disp_float(float *val, float min, float max, int idx, BaseSequentialStream *chp)
 {
-	(void)min; (void)max;
-	chprintf(chp, "[%3d]%s = %f\r\n", idx, cfg_names[idx], *val);
+	(void)min; (void)max; (void) idx;
+	chprintf(chp, "%s = %f\r\n", cfg_names[idx], *val);
 }
 void cfg_term_disp_notfound(BaseSequentialStream *chp)
 {
@@ -225,8 +225,7 @@ void shl_cfg(BaseSequentialStream *chp, int argc, char *argv[])
 		{
 			chprintf(chp, "%d : ", cfg_ids[i]);
 			CFGH_ID_TERM_DISP((&cfg), cfg_ids[i], chp);
-			chprintf(chp, "  %s\r\n", cfg_descriptions[i]);
-			// chprintf(chp, "%3d %s : %s\r\n", cfg_ids[i], cfg_names[i], cfg_descriptions[i]);
+			chprintf(chp, " `- %s\r\n", cfg_descriptions[i]);
 		}
 	}
 	if(argc == 1)
