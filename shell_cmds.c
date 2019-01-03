@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include "cfg.h"
 #include <string.h>
+#include "flash.h"
 
 char ABOUT[] = "Step10V  Copyright (C) 2018  Charles-Henri Mousset\r\n\
 https://github.com/chmousset/Step10V\r\n\
@@ -237,7 +238,17 @@ void shl_cfg(BaseSequentialStream *chp, int argc, char *argv[])
 		}
 		else
 		{
-			CFGH_NAME_TERM_DISP((&cfg), argv[0], chp);
+			if(strcmp(argv[0], "save") == 0)
+				chprintf(chp, "saving cfg... %s\r\n", save_settings(&cfg) ? "OK" : "Failed");
+			else if(strcmp(argv[0], "load") == 0)
+				chprintf(chp, "loading cfg... %s\r\n", load_settings(&cfg) ? "OK" : "Failed");
+			else if(strcmp(argv[0], "default") == 0)
+			{
+				chprintf(chp, "Setting cfg to defaults\r\n");
+				cfg_setdefaults(&cfg);
+			}
+			else
+				CFGH_NAME_TERM_DISP((&cfg), argv[0], chp);
 		}
 	}
 	if(argc == 2)

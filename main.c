@@ -24,6 +24,7 @@
 #include "chprintf.h"
 #include "ctrloop.h"
 #include "canbus.h"
+#include "flash.h"
 
 
 static const I2CConfig i2c_cfg = {
@@ -57,10 +58,16 @@ static THD_FUNCTION(ThreadOLED, arg)
 int main(void) {
 	halInit();
 	chSysInit();
-	cfg_setdefaults(&cfg);
 
 	sdStart(&SD2, NULL);
 	start_shell();
+
+	if(!load_settings(&cfg))
+	{
+		cfg_setdefaults(&cfg);
+		chThdSleepMilliseconds(10);
+		chprintf((BaseSequentialStream*) &SD2, "Cannot load configuration from FLASH. Using default settings\r\n");
+	}
 
 	// init & start the OLED display
 	i2cStart(&I2CD3, &i2c_cfg);
