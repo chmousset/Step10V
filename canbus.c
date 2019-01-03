@@ -53,29 +53,6 @@ static THD_FUNCTION(can_rx, p) {
 	chEvtUnregister(&CAND1.rxfull_event, &el);
 }
 
-/*
- * Transmitter thread.
- */
-static THD_WORKING_AREA(can_tx_wa, 256);
-static THD_FUNCTION(can_tx, p)
-{
-	CANTxFrame txmsg;
-
-	(void)p;
-	chRegSetThreadName("transmitter");
-	txmsg.IDE = CAN_IDE_EXT;
-	txmsg.EID = 0x01234567;
-	txmsg.RTR = CAN_RTR_DATA;
-	txmsg.DLC = 8;
-	txmsg.data32[0] = 0x55AA55AA;
-	txmsg.data32[1] = 0x00FF00FF;
-
-	while (!chThdShouldTerminateX()) {
-		canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, TIME_MS2I(100));
-		chThdSleepMilliseconds(500);
-	}
-}
-
 void canBus_init(void)
 {
 	chprintf((BaseSequentialStream *)&SD2, "CAN bus init... ");
@@ -86,8 +63,6 @@ void canBus_init(void)
 
 	chThdCreateStatic(can_rx1_wa, sizeof(can_rx1_wa), NORMALPRIO + 7,
 					can_rx, (void *)&CAND1);
-	// chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7,
-	// 			can_tx, NULL);
 	chprintf((BaseSequentialStream *)&SD2, "done\r\n");
 }
 
