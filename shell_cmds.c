@@ -1,5 +1,5 @@
 // Step10V - STEP/DIR to analog amplifier CNC regulator
-// Copyright (C) 2018 Charles-Henri Mousset - ch.mousset@gmail.com
+// Copyright (C) 2018-2019 Charles-Henri Mousset - ch.mousset@gmail.com
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, version 3 of the License
@@ -24,7 +24,7 @@
 #include <string.h>
 #include "flash.h"
 
-char ABOUT[] = "Step10V  Copyright (C) 2018  Charles-Henri Mousset\r\n\
+char ABOUT[] = "Step10V  Copyright (C) 2018-2019  Charles-Henri Mousset\r\n\
 https://github.com/chmousset/Step10V\r\n\
 This program comes with ABSOLUTELY NO WARRANTY;\r\n\
 This is free software, and you are welcome to redistribute it under certain\r\n\
