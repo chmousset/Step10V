@@ -19,8 +19,12 @@
 #define _CHIBIOS_RT_CONF_
 #define _CHIBIOS_RT_CONF_VER_5_0_
 
-#define CHPRINTF_USE_FLOAT TRUE
+#define CHPRINTF_USE_FLOAT          TRUE
 
+#define SHELL_USE_HISTORY           TRUE
+#define SHELL_USE_COMPLETION        TRUE
+#define SHELL_USE_ESC_SEQ           TRUE
+#define SHELL_MAX_ARGUMENTS         12
 
 #define CH_CFG_ST_RESOLUTION                32
 #define CH_CFG_ST_FREQUENCY                 10000

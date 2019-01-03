@@ -277,9 +277,14 @@ static const ShellCommand commands[] = {
 	{NULL, NULL}
 };
 
+char histbuff[128] = "";
+
 static const ShellConfig shell_cfg = {
 	(BaseSequentialStream *)&SD2,
-	commands
+	commands,
+	histbuff,
+	sizeof(histbuff),
+	.sc_completion = NULL
 };
 
 static THD_WORKING_AREA(waShell, 2048);
