@@ -21,11 +21,14 @@
 extern cfg_t cfg;
 
 enum CAN_FN {
-	CAN_READ_CFG_REQUEST = 1,
-	CAN_READ_CFG = 2,
-	CAN_WRITE_CFG = 3,
-	CAN_WRITE_CFG_ACK = 4,
-	CAN_PD_BROADCAST = 5
+	CAN_READ_CFG_REQUEST = 10,
+	CAN_READ_CFG = 11,
+	CAN_WRITE_CFG = 20,
+	CAN_WRITE_CFG_ACK = 21,
+	CAN_WRITE_CFG_ERR_NOTFOUND = 22,
+	CAN_WRITE_CFG_ERR_FORMAT = 23,
+	CAN_WRITE_CFG_ERR_RANGE = 24,
+	CAN_PD_BROADCAST = 30
 };
 
 void canBus_init(void);
@@ -35,5 +38,12 @@ void cfg_can_read_uint32_t(uint32_t *val, uint32_t min, uint32_t max, int idx, C
 void cfg_can_read_bool(bool *val, bool min, bool max, int idx, CANRxFrame *can_rx_frame);
 void cfg_can_read_float(float *val, float min, float max, int idx, CANRxFrame *can_rx_frame);
 void cfg_can_read_notfound(CANRxFrame *can_rx_frame);
+
+
+void cfg_can_save_int(int *val, int min, int max, int idx, CANRxFrame *can_rx_frame);
+void cfg_can_save_uint32_t(uint32_t *val, uint32_t min, uint32_t max, int idx, CANRxFrame *can_rx_frame);
+void cfg_can_save_bool(bool *val, bool min, bool max, int idx, CANRxFrame *can_rx_frame);
+void cfg_can_save_float(float *val, float min, float max, int idx, CANRxFrame *can_rx_frame);
+void cfg_can_save_notfound(CANRxFrame *can_rx_frame);
 
 #endif

@@ -47,7 +47,13 @@ static THD_FUNCTION(can_rx, p) {
 				chprintf((BaseSequentialStream *)&SD2, " %02X", rxmsg.data8[i]);
 			chprintf((BaseSequentialStream *)&SD2, "\r\n");
 			if(rxmsg.SID == cfg.can_id && rxmsg.data8[0] == CAN_READ_CFG_REQUEST)
+			{
 				CFGH_ID_CAN_READ(&cfg, rxmsg.data8[1], &rxmsg);
+			}
+			else if(rxmsg.SID == cfg.can_id && rxmsg.data8[0] == CAN_WRITE_CFG)
+			{
+				CFGH_ID_CAN_SAVE(&cfg, rxmsg.data8[1], &rxmsg);
+			}
 		}
 	}
 	chEvtUnregister(&CAND1.rxfull_event, &el);
@@ -133,18 +139,114 @@ void cfg_can_read_notfound(CANRxFrame *can_rx_frame)
 }
 
 
-// void cfg_can_write_int(int *val, int min, int max, int idx, CANRxFrame *can_rx_frame)
-// {
-// }
-// void cfg_can_write_uint32_t(uint32_t *val, uint32_t min, uint32_t max, int idx, CANRxFrame *can_rx_frame)
-// {
-// }
-// void cfg_can_write_bool(bool *val, bool min, bool max, int idx, CANRxFrame *can_rx_frame)
-// {
-// }
-// void cfg_can_write_float(float *val, float min, float max, int idx, CANRxFrame *can_rx_frame)
-// {
-// }
-// void cfg_can_write_notfound(CANRxFrame *can_rx_frame)
-// {
-// }
+inline void cfg_save_prepare(CANRxFrame *rx, CANTxFrame *tx, enum CAN_FN fn)
+{
+	tx->IDE = CAN_IDE_STD;
+	tx->RTR = CAN_RTR_DATA;
+	tx->SID = cfg.can_id;
+	tx->data8[0] = fn;
+	tx->data8[1] = rx->data8[1];	// ID of the cfg variable
+	tx->DLC = 2;
+}
+
+void cfg_can_save_int(int *val, int min, int max, int idx, CANRxFrame *can_rx_frame)
+{
+	(void) idx;
+	CANTxFrame tx;
+	if(can_rx_frame->DLC != 2 + sizeof(__typeof__(*val)))
+	{
+		cfg_save_prepare(can_rx_frame, &tx, CAN_WRITE_CFG_ERR_FORMAT);
+	}
+	else
+	{
+		unsigned int i;
+		__typeof__(*val) tmp = 0;
+		for(i=0; i<sizeof(int); i++)
+			tmp = (tmp << 8) | can_rx_frame->data8[2+i];
+		if((tmp <= max) && (tmp >= min))
+		{
+			*val = tmp;
+			cfg_save_prepare(can_rx_frame, &tx, CAN_WRITE_CFG_ACK);
+		}
+		else
+			cfg_save_prepare(can_rx_frame, &tx, CAN_WRITE_CFG_ERR_RANGE);
+	}
+	canTransmit(&CAND1, CAN_ANY_MAILBOX, &tx, TIME_IMMEDIATE);
+}
+
+void cfg_can_save_uint32_t(uint32_t *val, uint32_t min, uint32_t max, int idx, CANRxFrame *can_rx_frame)
+{
+	(void) idx;
+	CANTxFrame tx;
+	if(can_rx_frame->DLC != 2 + sizeof(__typeof__(*val)))
+	{
+		cfg_save_prepare(can_rx_frame, &tx, CAN_WRITE_CFG_ERR_FORMAT);
+	}
+	else
+	{
+		unsigned int i;
+		__typeof__(*val) tmp = 0;
+		for(i=0; i<sizeof(int); i++)
+			tmp = (tmp << 8) | can_rx_frame->data8[2+i];
+		if((tmp <= max) && (tmp >= min))
+		{
+			*val = tmp;
+			cfg_save_prepare(can_rx_frame, &tx, CAN_WRITE_CFG_ACK);
+		}
+		else
+			cfg_save_prepare(can_rx_frame, &tx, CAN_WRITE_CFG_ERR_RANGE);
+	}
+	canTransmit(&CAND1, CAN_ANY_MAILBOX, &tx, TIME_IMMEDIATE);
+}
+
+void cfg_can_save_bool(bool *val, bool min, bool max, int idx, CANRxFrame *can_rx_frame)
+{
+	(void) idx;
+	CANTxFrame tx;
+	if(can_rx_frame->DLC != 2 + sizeof(__typeof__(*val)))
+	{
+		cfg_save_prepare(can_rx_frame, &tx, CAN_WRITE_CFG_ERR_FORMAT);
+	}
+	else
+	{
+		__typeof__(*val) tmp = can_rx_frame->data8[2] ? TRUE : FALSE;
+		if((tmp <= max) && (tmp >= min))
+		{
+			*val = tmp;
+			cfg_save_prepare(can_rx_frame, &tx, CAN_WRITE_CFG_ACK);
+		}
+		else
+			cfg_save_prepare(can_rx_frame, &tx, CAN_WRITE_CFG_ERR_RANGE);
+	}
+	canTransmit(&CAND1, CAN_ANY_MAILBOX, &tx, TIME_IMMEDIATE);
+}
+
+void cfg_can_save_float(float *val, float min, float max, int idx, CANRxFrame *can_rx_frame)
+{
+	(void) idx;
+	CANTxFrame tx;
+	if(can_rx_frame->DLC != 2 + sizeof(__typeof__(*val)))
+	{
+		cfg_save_prepare(can_rx_frame, &tx, CAN_WRITE_CFG_ERR_FORMAT);
+	}
+	else
+	{
+		__typeof__(*val) tmp;
+		memcpy((void*) &tmp, (void*) &can_rx_frame->data8[2], sizeof(__typeof__(*val)));
+		if((tmp <= max) && (tmp >= min))
+		{
+			*val = tmp;
+			cfg_save_prepare(can_rx_frame, &tx, CAN_WRITE_CFG_ACK);
+		}
+		else
+			cfg_save_prepare(can_rx_frame, &tx, CAN_WRITE_CFG_ERR_RANGE);
+	}
+	canTransmit(&CAND1, CAN_ANY_MAILBOX, &tx, TIME_IMMEDIATE);
+}
+
+void cfg_can_save_notfound(CANRxFrame *can_rx_frame)
+{
+	CANTxFrame tx;
+	cfg_save_prepare(can_rx_frame, &tx, CAN_WRITE_CFG_ERR_NOTFOUND);
+	canTransmit(&CAND1, CAN_ANY_MAILBOX, &tx, TIME_IMMEDIATE);
+}
