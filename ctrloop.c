@@ -91,16 +91,25 @@ void init_stepdir(GPTDriver *drv, uint8_t filter)
 }
 
 
-void dac_out(int32_t dac)
+void dac_out(float dac)
 {
 	uint16_t dac1, dac2;
+	int16_t dacint;
 	if(dac > 0)
 		dac += 10;
 	if(dac < 0)
 		dac -= 10;
+	if(cfg.invert_o)
+		dac = -1 * dac;
 
-	dac1 = (uint16_t)(2048 + dac/2);
-	dac2 = (uint16_t)(2048 - dac/2);
+	dacint = (int16_t) (dac*20.48);
+	if(dacint > 2047)
+		dacint = 2047;
+	else if(dacint < -2047)
+		dacint = -2047;
+
+	dac1 = (uint16_t)(2048 + dacint);
+	dac2 = (uint16_t)(2048 - dacint);
 
 	dac_lld_put_channel(&DACD1, 0, dac1);
 	dac_lld_put_channel(&DACD1, 1, dac2);
@@ -123,6 +132,7 @@ struct sig_pid_param_f pid_p= {
 	.feedback = &feedback
 };
 struct signal_float pid = SIG_FN((sig_func_f)sig_pid_opt_f, &pid_p);
+float pid_out;
 
 bool update_pid_params = 1;
 inline void update_params(void)
@@ -148,7 +158,7 @@ void ctl_loop(GPTDriver *drv)
 	cnt2 = (int32_t)GPTD2.tim->CNT;
 	diff_cnt1 = (cnt1 - old_cnt1);
 	diff_cnt2 = (cnt2 - old_cnt2);
-	error += ((int32_t) diff_cnt1) - diff_cnt2*10;
+	error += ((int32_t) diff_cnt1) + diff_cnt2*5;
 	old_cnt1 = cnt1;
 	old_cnt2 = cnt2;
 
@@ -161,8 +171,9 @@ void ctl_loop(GPTDriver *drv)
 	// feeding the error into the feedback with setpoint = 0
 	// works as we don't use feed-forward
 	feedback.x_cst = (float) error;
+	pid_out =  sig_get_value_f(&pid, n++);
 	if(loop_enable)
-		dac_out( (int32_t) sig_get_value_f(&pid, n++) );
+		dac_out( (int32_t) pid_out );
 	palClearLine(LINE_LED_GREEN);
 }
 
