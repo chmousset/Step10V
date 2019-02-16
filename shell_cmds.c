@@ -34,6 +34,7 @@ You should have received a copy of the GNU General Public License along with\r\n
 this program. If not, see <https://www.gnu.org/licenses/>.\r\n";
 
 cfg_t cfg;
+extern bool update_pid_params;
 
 float stof(const char* s){
 	float rez = 0, fact = 1;
@@ -226,6 +227,7 @@ void shl_cfg(BaseSequentialStream *chp, int argc, char *argv[])
 		{
 			CFGH_NAME_TERM_SAVE((&cfg), argv[0], chp, argv[1]);
 		}
+		update_pid_params = true;
 	}
 }
 
