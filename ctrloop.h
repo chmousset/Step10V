@@ -19,6 +19,7 @@
 
 extern struct signal_float feedback;
 extern bool loop_enable;
+extern float pid_out;
 
 void ctl_loop(GPTDriver *drv);
 void init_ctrloop(void);

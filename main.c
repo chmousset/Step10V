@@ -40,7 +40,7 @@ static const I2CConfig i2c_cfg = {
 static THD_WORKING_AREA(waThreadOLED, 1024);
 static THD_FUNCTION(ThreadOLED, arg)
 {
-	char buf[10];
+	char buf[18];
 	(void)arg;
 	chRegSetThreadName("oled");
 	chThdSleepMilliseconds(100);
@@ -50,7 +50,7 @@ static THD_FUNCTION(ThreadOLED, arg)
 	while (true) {
 		chThdSleepMilliseconds(50);
 		// chsnprintf(buf, 10, "%d",  chVTGetSystemTime());	// feedback.x_cst
-		chsnprintf(buf, 6, "%04d ",  (int) feedback.x_cst);
+		chsnprintf(buf, 18, "e%d o%.2f",  (int) feedback.x_cst, pid_out);
 		ssd_puts16(2, 0, buf);
 	}
 }
