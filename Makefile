@@ -239,3 +239,6 @@ include $(RULESPATH)/rules.mk
 # configuration generator
 cfg.c cfg.h: cfg.csv cfg2c.py
 	python cfg2c.py cfg.csv --instances cfg --handlers term_save term_disp can_save can_read
+
+flash: build/$(PROJECT).bin
+	st-flash write build/$(PROJECT).bin 0x8000000
